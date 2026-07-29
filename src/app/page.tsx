@@ -120,7 +120,7 @@ export default function Home() {
         {store.category && (
           <p className="mt-2 text-sm text-slate-500">
             {store.category}
-            {store.address ? ` · ${store.address}` : ""}
+            {store.address ? ` · ${store.address}` : ""} · 000-0000-0000
           </p>
         )}
         {store.description && (
