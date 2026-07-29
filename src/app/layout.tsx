@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "게시판",
-  description: "Next.js와 Supabase로 만든 간단한 게시판",
+  title: "미니 캐치테이블",
+  description: "실시간 웨이팅 및 당일 시간대별 예약 슬롯 관리 플랫폼",
 };
 
 export default function RootLayout({

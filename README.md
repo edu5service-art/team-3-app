@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 미니 캐치테이블 (Mini CatchTable)
 
-## Getting Started
+실시간 원격 웨이팅 및 당일 시간대별 예약 슬롯 관리 플랫폼. 회원가입/로그인 없이 비회원 전용으로 동작합니다.
 
-First, run the development server:
+## 구성
+
+- Next.js (App Router) + Tailwind CSS
+- Supabase (PostgreSQL + Realtime)
+
+## 페이지
+
+- `/` — 고객 화면: 오늘의 시간대별 예약 슬롯 조회/예약, 실시간 웨이팅 신청
+- `/owner` — 점주 대시보드: 예약 슬롯 현황, 웨이팅 대기열 관리 (호출/입장완료/취소)
+
+## 시작하기
+
+1. `supabase/schema.sql`을 Supabase SQL Editor에서 실행 (테이블 생성 + RLS 정책 + Realtime 등록 + 데모 매장/슬롯 시드)
+2. `.env.local`에 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 설정
+3. 개발 서버 실행
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[http://localhost:3000](http://localhost:3000) 에서 확인할 수 있습니다.
