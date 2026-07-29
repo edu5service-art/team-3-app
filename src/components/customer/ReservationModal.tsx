@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import type { ReservationSlot } from "@/lib/supabase";
+import { addMyReservedSlotId } from "@/lib/reservationStorage";
 
 function formatTime(time: string) {
   return time.slice(0, 5);
@@ -46,6 +47,7 @@ export default function ReservationModal({
       return;
     }
 
+    addMyReservedSlotId(slot.store_id, slot.id);
     onReserved();
   };
 

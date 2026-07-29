@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { ReservationSlot, Store } from "@/lib/supabase";
 import SlotGrid from "@/components/customer/SlotGrid";
 import ReservationModal from "@/components/customer/ReservationModal";
 import WaitingPanel from "@/components/customer/WaitingPanel";
+import MyReservations from "@/components/customer/MyReservations";
 
 type Tab = "reservation" | "waiting";
 
@@ -116,6 +118,8 @@ export default function Home() {
         )}
       </header>
 
+      <MyReservations storeId={store.id} slots={slots} />
+
       <div className="mb-8 flex justify-center gap-2">
         <button
           type="button"
@@ -156,6 +160,12 @@ export default function Home() {
           onReserved={() => setSelectedSlot(null)}
         />
       )}
+
+      <p className="mt-12 text-center text-sm text-slate-400">
+        <Link href="/owner" className="underline hover:text-slate-600">
+          점주이신가요?
+        </Link>
+      </p>
     </main>
   );
 }
