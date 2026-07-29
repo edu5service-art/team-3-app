@@ -15,7 +15,13 @@ const STATUS_LABEL: Record<Waiting["status"], string> = {
   CANCELLED: "취소됨",
 };
 
-export default function WaitingPanel({ storeId }: { storeId: string }) {
+export default function WaitingPanel({
+  storeId,
+  businessDate,
+}: {
+  storeId: string;
+  businessDate: string;
+}) {
   const [waitings, setWaitings] = useState<Waiting[]>([]);
   const [myWaitingId, setLocalMyWaitingId] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -31,14 +37,11 @@ export default function WaitingPanel({ storeId }: { storeId: string }) {
   }, [storeId]);
 
   const fetchWaitings = async () => {
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
     const { data } = await supabase
       .from("waitings")
       .select("*")
       .eq("store_id", storeId)
-      .gte("created_at", startOfToday.toISOString())
+      .eq("business_date", businessDate)
       .order("waiting_number", { ascending: true });
 
     if (data) setWaitings(data as Waiting[]);
@@ -61,7 +64,7 @@ export default function WaitingPanel({ storeId }: { storeId: string }) {
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeId]);
+  }, [storeId, businessDate]);
 
   const myWaiting = waitings.find((w) => w.id === myWaitingId) ?? null;
 

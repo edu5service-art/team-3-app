@@ -18,18 +18,21 @@ const STATUS_STYLE: Record<WaitingStatus, string> = {
   CANCELLED: "bg-slate-100 text-slate-400",
 };
 
-export default function WaitingQueue({ storeId }: { storeId: string }) {
+export default function WaitingQueue({
+  storeId,
+  businessDate,
+}: {
+  storeId: string;
+  businessDate: string;
+}) {
   const [waitings, setWaitings] = useState<Waiting[]>([]);
 
   const fetchWaitings = async () => {
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
     const { data } = await supabase
       .from("waitings")
       .select("*")
       .eq("store_id", storeId)
-      .gte("created_at", startOfToday.toISOString())
+      .eq("business_date", businessDate)
       .order("waiting_number", { ascending: true });
 
     if (data) setWaitings(data as Waiting[]);
@@ -52,7 +55,7 @@ export default function WaitingQueue({ storeId }: { storeId: string }) {
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeId]);
+  }, [storeId, businessDate]);
 
   const updateStatus = async (id: string, status: WaitingStatus) => {
     await supabase.from("waitings").update({ status }).eq("id", id);

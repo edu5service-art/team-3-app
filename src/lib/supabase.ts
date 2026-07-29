@@ -11,6 +11,7 @@ export type Store = {
   address: string | null;
   category: string | null;
   description: string | null;
+  current_business_date: string;
   created_at: string;
 };
 
@@ -42,6 +43,7 @@ export type Waiting = {
   store_id: string;
   waiter_name: string;
   party_size: number;
+  business_date: string;
   waiting_number: number;
   status: WaitingStatus;
   created_at: string;

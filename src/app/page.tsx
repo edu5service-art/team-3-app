@@ -19,34 +19,43 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStore = async () => {
-      const { data, error: storeError } = await supabase
-        .from("stores")
-        .select("*")
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
+  const fetchStore = async () => {
+    const { data, error: storeError } = await supabase
+      .from("stores")
+      .select("*")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
 
-      if (storeError) {
-        setError("매장 정보를 불러오지 못했습니다: " + storeError.message);
-        setLoading(false);
-        return;
-      }
-      setStore(data as Store | null);
+    if (storeError) {
+      setError("매장 정보를 불러오지 못했습니다: " + storeError.message);
       setLoading(false);
-    };
+      return;
+    }
+    setStore(data as Store | null);
+    setLoading(false);
+  };
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load, not a render-time side effect
     fetchStore();
+
+    const channel = supabase
+      .channel("store-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "stores" }, () => fetchStore())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  const fetchSlots = async (storeId: string) => {
-    const today = new Date().toISOString().slice(0, 10);
+  const fetchSlots = async (storeId: string, businessDate: string) => {
     const { data } = await supabase
       .from("reservation_slots")
       .select("*")
       .eq("store_id", storeId)
-      .eq("slot_date", today)
+      .eq("slot_date", businessDate)
       .order("slot_time", { ascending: true });
 
     if (data) setSlots(data as ReservationSlot[]);
@@ -56,7 +65,7 @@ export default function Home() {
     if (!store) return;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load, not a render-time side effect
-    fetchSlots(store.id);
+    fetchSlots(store.id, store.current_business_date);
 
     const channel = supabase
       .channel(`slots-${store.id}`)
@@ -68,14 +77,15 @@ export default function Home() {
           table: "reservation_slots",
           filter: `store_id=eq.${store.id}`,
         },
-        () => fetchSlots(store.id)
+        () => fetchSlots(store.id, store.current_business_date)
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [store]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store?.id, store?.current_business_date]);
 
   if (loading) {
     return (
@@ -118,6 +128,8 @@ export default function Home() {
         )}
       </header>
 
+      <p className="mb-6 text-center text-xs text-slate-400">{store.current_business_date} 기준</p>
+
       <MyReservations storeId={store.id} slots={slots} />
 
       <div className="mb-8 flex justify-center gap-2">
@@ -151,7 +163,9 @@ export default function Home() {
         </div>
       )}
 
-      {tab === "waiting" && <WaitingPanel storeId={store.id} />}
+      {tab === "waiting" && (
+        <WaitingPanel storeId={store.id} businessDate={store.current_business_date} />
+      )}
 
       {selectedSlot && (
         <ReservationModal
