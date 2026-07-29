@@ -171,7 +171,10 @@ export default function Home() {
         <ReservationModal
           slot={selectedSlot}
           onClose={() => setSelectedSlot(null)}
-          onReserved={() => setSelectedSlot(null)}
+          onReserved={() => {
+            setSelectedSlot(null);
+            fetchSlots(store.id, store.current_business_date);
+          }}
         />
       )}
 
