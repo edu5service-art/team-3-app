@@ -30,11 +30,16 @@ create table if not exists reservation_slots (
 -- 3. 예약
 create table if not exists reservations (
   id uuid primary key default gen_random_uuid(),
-  slot_id uuid not null unique references reservation_slots(id) on delete cascade,
+  slot_id uuid not null references reservation_slots(id) on delete cascade,
   reserver_name text not null,
   status text not null default 'CONFIRMED' check (status in ('CONFIRMED', 'CANCELLED')),
   reserved_at timestamptz not null default now()
 );
+
+-- 취소된 예약은 같은 슬롯에 대한 재예약을 막지 않도록, 취소되지 않은 예약에 한해서만 슬롯당 1건으로 제한
+create unique index if not exists reservations_slot_id_active_idx
+  on reservations (slot_id)
+  where status <> 'CANCELLED';
 
 -- 예약이 생기면 슬롯을 자동으로 마감 처리
 create or replace function close_slot_on_reservation()

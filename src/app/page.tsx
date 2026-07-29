@@ -130,7 +130,11 @@ export default function Home() {
 
       <p className="mb-6 text-center text-xs text-slate-400">{store.current_business_date} 기준</p>
 
-      <MyReservations storeId={store.id} slots={slots} />
+      <MyReservations
+        storeId={store.id}
+        slots={slots}
+        onCancelled={() => fetchSlots(store.id, store.current_business_date)}
+      />
 
       <div className="mb-8 flex justify-center gap-2">
         <button

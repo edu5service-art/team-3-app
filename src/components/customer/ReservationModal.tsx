@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import type { ReservationSlot } from "@/lib/supabase";
-import { addMyReservedSlotId } from "@/lib/reservationStorage";
+import { addMyReservation } from "@/lib/reservationStorage";
 
 function formatTime(time: string) {
   return time.slice(0, 5);
@@ -32,22 +32,24 @@ export default function ReservationModal({
     setSubmitting(true);
     setError(null);
 
-    const { error: insertError } = await supabase
+    const { data, error: insertError } = await supabase
       .from("reservations")
-      .insert({ slot_id: slot.id, reserver_name: name.trim() });
+      .insert({ slot_id: slot.id, reserver_name: name.trim() })
+      .select()
+      .single();
 
     setSubmitting(false);
 
-    if (insertError) {
-      if (insertError.code === "23505") {
+    if (insertError || !data) {
+      if (insertError?.code === "23505") {
         setError("바로 직전에 다른 분이 먼저 예약했어요. 다른 시간대를 선택해 주세요.");
       } else {
-        setError("예약에 실패했습니다: " + insertError.message);
+        setError("예약에 실패했습니다: " + insertError?.message);
       }
       return;
     }
 
-    addMyReservedSlotId(slot.store_id, slot.id);
+    addMyReservation(slot.store_id, slot.id, data.id);
     onReserved();
   };
 
